@@ -177,27 +177,51 @@ class AGIOpenClient:
             ])
             
             agent.set_task(
-                task="Create LinkedIn post: open tab, paste text, upload image, STOP",
+                task="Create LinkedIn post, publish it, and share with top 2 people",
                 todos=todos
             )
             
             # Instruction including post and share
             image_filename_str = os.path.basename(final_image_path) if final_image_path else None
             
-            instruction_text = f"""Create and share a LinkedIn post:
+            # Build instruction with correct numbering
+            if final_image_path:
+                instruction_text = f"""Create and share a LinkedIn post:
 
 1. Open linkedin.com/feed in new tab - wait 3 seconds
 2. Click 'Start a post' text box/button - wait 2 seconds for modal
 3. Click inside the large text input area in the modal
 4. Press Cmd+V (Mac) or Ctrl+V (Windows) to paste - wait 1 second
-{f'''5. Click the photo/media icon button in the toolbar (usually bottom left of the post editor)
+5. Click the photo/media icon button in the toolbar (usually bottom left of the post editor)
 6. Wait 2 seconds for file dialog
 7. Press Cmd+Shift+G (Mac) to open 'Go to folder', then type: {linkedin_images_folder}
 8. Press Enter to navigate to that folder
 9. Click on the file: {image_filename_str}
 10. Click 'Open' button
 11. Wait 5 seconds for image to appear
-12. Click the 'Post' button to publish''' if final_image_path else '5. Click the "Post" button to publish'}
+12. Click the 'Post' button to publish
+13. Wait 5 seconds for post to be published
+14. Click 'Activity' in the left sidebar navigation menu
+15. Wait 3 seconds for Activity page to load
+16. Find your most recent post (should be at the top of the list)
+17. Click the 'Share' button on your post (usually has a forward arrow icon)
+18. Wait 2 seconds for the share modal/dialog to open
+19. In the 'Type a name' section, you will see a list of people - select the FIRST person shown (click their checkbox or name)
+20. Select the SECOND person shown in the list (click their checkbox or name)
+21. Click inside the 'Write a message' text box
+22. Type exactly: new post check it out!
+23. Click the 'Send' button to share the post with the selected people
+24. Wait 2 seconds to confirm completion
+
+IMPORTANT: Text is in clipboard. Paste it, post it, then share with top 2 people from the list."""
+            else:
+                instruction_text = f"""Create and share a LinkedIn post:
+
+1. Open linkedin.com/feed in new tab - wait 3 seconds
+2. Click 'Start a post' text box/button - wait 2 seconds for modal
+3. Click inside the large text input area in the modal
+4. Press Cmd+V (Mac) or Ctrl+V (Windows) to paste - wait 1 second
+5. Click the 'Post' button to publish
 6. Wait 5 seconds for post to be published
 7. Click 'Activity' in the left sidebar navigation menu
 8. Wait 3 seconds for Activity page to load
