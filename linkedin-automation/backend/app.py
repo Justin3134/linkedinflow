@@ -382,7 +382,7 @@ def create_and_publish_post():
             post_record = PostHistory(
                 post_id=result.get("post_id", f"draft_{uuid.uuid4().hex[:8]}"),
                 content=post_content,
-                image_url=image_url or "",
+                image_url=image_url_or_path or "",
                 linkedin_url=result.get("post_url", "Draft ready"),
                 source_type="automated",
                 engagement_count=0
