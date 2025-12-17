@@ -24,6 +24,9 @@ DATABASE_URL = "sqlite:///linkedin_automation.db"
 FLASK_PORT = 5001
 FRONTEND_URL = "http://localhost:8080"  # Your Vite dev server port
 
+# LinkedIn Profile URL (for sharing posts)
+LINKEDIN_PROFILE_URL = os.getenv('LINKEDIN_PROFILE_URL', 'https://www.linkedin.com/in/junhyun-kim-15840128b/')
+
 # CORS - Allow multiple common dev ports
 ALLOWED_ORIGINS = [
     "http://localhost:8080",
