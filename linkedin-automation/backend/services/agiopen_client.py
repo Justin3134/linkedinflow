@@ -137,80 +137,54 @@ class AGIOpenClient:
                 print(f"✅ Image ready at: {final_image_path}")
             
             todos = [
-                "Open a new browser tab",
-                "Type 'linkedin.com/feed' in the address bar and press Enter",
-                "Wait 5 seconds for LinkedIn to fully load",
-                "Look for the text box that says 'Start a post' or the button with 'Start a post' text",
-                "Click on 'Start a post' - this will open the post composer modal/editor",
-                "Wait 5 seconds for the post editor modal to fully appear and be ready",
-                "Look for the large text area inside the post editor modal - it should be a text input box",
-                "Click directly inside this text area to focus it - make sure the cursor is blinking inside the text box",
-                "Wait 2 seconds to ensure the text area is focused and ready for input",
-                "Now paste the text using Cmd+V (Mac) or Ctrl+V (Windows) - the text is already in your clipboard",
-                "Wait 3 seconds to verify the pasted text appears in the text area - you should see the text content displayed"
+                "Open a new browser tab and navigate to linkedin.com/feed",
+                "Wait 3 seconds for page to load",
+                "Click the text box or button that says 'Start a post'",
+                "Wait 2 seconds for the post composer modal to open",
+                "Click inside the main text input area in the modal (where you type posts)",
+                "Paste the content using Cmd+V (Mac) or Ctrl+V (Windows)",
+                "Wait 1 second to verify text appears"
             ]
             
             # Add image upload if provided - but STOP after upload (don't click Post)
             if final_image_path and os.path.exists(final_image_path):
                 todos.extend([
-                    "Look for the 'Add media' button in the post editor - it might be an icon with a picture or say 'Add media' or 'Photo'",
-                    "Click the 'Add media' button - this will open the file upload dialog",
-                    "Wait 3 seconds for the file upload dialog to fully open",
-                    f"In the file dialog, navigate to this exact folder: {linkedin_images_folder}",
-                    f"Look for and select the image file named: {os.path.basename(final_image_path)}",
-                    "Click the 'Open' button in the file dialog to upload the image",
-                    "Wait 8 seconds for the image to upload completely and appear in the post preview area",
-                    "Verify the image is now visible in the post editor preview - you should see the image displayed",
-                    "STOP IMMEDIATELY - Do NOT click the Post button. The draft is complete and ready for manual review."
+                    "Click the icon button with a picture or camera icon (Add media/Photo button) in the post editor toolbar",
+                    "Wait 2 seconds for file dialog to open",
+                    f"Press Cmd+Shift+G (Mac) to open 'Go to folder' dialog, then type this exact path: {linkedin_images_folder}",
+                    f"Look for file named: {os.path.basename(final_image_path)}",
+                    "Click on the image file to select it",
+                    "Click 'Open' button to upload",
+                    "Wait 5 seconds for upload to complete",
+                    "STOP - Do NOT click Post button. Draft is ready."
                 ])
             else:
-                todos.append("STOP IMMEDIATELY - Do NOT click the Post button. The draft is complete and ready for manual review.")
+                todos.append("STOP - Do NOT click Post button. Draft is ready.")
             
             agent.set_task(
                 task="Create LinkedIn post: open tab, paste text, upload image, STOP",
                 todos=todos
             )
             
-            # Detailed instruction with clear steps
+            # Simplified, faster instruction
             image_filename_str = os.path.basename(final_image_path) if final_image_path else None
             
-            instruction_text = f"""Create a LinkedIn post draft by following these EXACT steps in order:
+            instruction_text = f"""Create a LinkedIn post draft quickly:
 
-STEP 1: Open LinkedIn
-- Open a new browser tab
-- Type 'linkedin.com/feed' in the address bar
-- Press Enter
-- Wait 5 seconds for the page to fully load
+1. Open linkedin.com/feed in new tab - wait 3 seconds
+2. Click 'Start a post' text box/button - wait 2 seconds for modal
+3. Click inside the large text input area in the modal
+4. Press Cmd+V (Mac) or Ctrl+V (Windows) to paste - wait 1 second
+{f'''5. Click the photo/media icon button in the toolbar (usually bottom left of the post editor)
+6. Wait 2 seconds for file dialog
+7. Press Cmd+Shift+G (Mac) to open 'Go to folder', then type: {linkedin_images_folder}
+8. Press Enter to navigate to that folder
+9. Click on the file: {image_filename_str}
+10. Click 'Open' button
+11. Wait 5 seconds for image to appear
+12. STOP immediately - do NOT click Post''' if final_image_path else '5. STOP immediately - do NOT click Post'}
 
-STEP 2: Open Post Composer
-- Look for the text box that says 'Start a post' or find the button with 'Start a post' text
-- Click on 'Start a post' - this will open the post composer modal/editor
-- Wait 5 seconds for the post editor modal to fully appear and be ready
-
-STEP 3: Paste Text Content
-- Find the large text input area inside the post editor modal - it's the main text box where you type posts
-- Click directly inside this text area to focus it - make sure the cursor is blinking inside the text box
-- Wait 2 seconds to ensure the text area is focused and ready for input
-- Press Cmd+V (Mac) or Ctrl+V (Windows) to paste the text from clipboard
-- Wait 3 seconds and verify the pasted text appears in the text area - you should see the text content displayed
-
-{f'''STEP 4: Upload Image
-- Look for the 'Add media' button in the post editor - it might be an icon with a picture or say 'Add media' or 'Photo'
-- Click the 'Add media' button - this will open the file upload dialog
-- Wait 3 seconds for the file upload dialog to fully open
-- In the file dialog, navigate to this exact folder path: {linkedin_images_folder}
-- Look for and select the image file named: {image_filename_str}
-- Click the 'Open' button in the file dialog to upload the image
-- Wait 10 seconds for the image to upload completely and appear in the post preview area
-- Verify the image is now visible in the post editor preview - you should see the image displayed below the text
-- STOP IMMEDIATELY - Do NOT click the Post button. The draft is complete and ready for manual review.''' if final_image_path else 'STEP 4: STOP IMMEDIATELY - Do NOT click the Post button. The draft is complete and ready for manual review.'}
-
-CRITICAL REMINDERS:
-- The text content is already copied to your clipboard - just paste it (Cmd+V or Ctrl+V)
-- After pasting text, wait to see it appear in the text area
-{f'- After uploading image, wait to see it appear in the preview - then STOP' if final_image_path else ''}
-- Do NOT click the Post button - stop immediately after text is pasted{f' and image is uploaded' if final_image_path else ''}
-"""
+IMPORTANT: Text is in clipboard. Just paste it. After image upload (if any), STOP without clicking Post."""
             
             # Store task reference BEFORE creating it for proper cancellation
             self.current_task = asyncio.create_task(
